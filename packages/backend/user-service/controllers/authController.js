@@ -1,13 +1,18 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { findUserByEmail, createUser } from "../repositories/userRepository.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 // Registro de usuario
 export const registerUser = async (req, res) => {
+    console.log("📌 Datos recibidos en registerUser:", req.body);
+
     const { nombre, email, contraseña } = req.body;
+
+    if (!nombre || !email || !contraseña) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    }
 
     try {
         const existingUser = await findUserByEmail(email);
@@ -16,11 +21,11 @@ export const registerUser = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(contraseña, 10);
-        await createUser(nombre, email, hashedPassword);
+        const newUser = await createUser(nombre, email, hashedPassword);
 
-        res.status(201).json({ message: "Usuario registrado con éxito" });
+        res.status(201).json({ message: "Usuario registrado con éxito", user: newUser });
     } catch (error) {
-        console.error("Error en registerUser:", error.message);
+        console.error("❌ Error en registerUser:", error.message);
         res.status(500).json({ error: "Error en el servidor" });
     }
 };
@@ -40,13 +45,7 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ error: "Credenciales inválidas" });
         }
 
-        const token = jwt.sign(
-            { id: user.id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES }
-        );
-
-        res.status(200).json({ token, user: { id: user.id, email: user.email, nombre: user.nombre } });
+        res.status(200).json({ user: { id: user.id, email: user.email, nombre: user.nombre } });
     } catch (error) {
         console.error("Error en loginUser:", error.message);
         res.status(500).json({ error: "Error en el servidor" });

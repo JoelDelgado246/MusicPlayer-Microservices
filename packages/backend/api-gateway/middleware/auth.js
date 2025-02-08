@@ -5,7 +5,6 @@ dotenv.config();
 
 export const verifyToken = (req, res, next) => {
     const token = req.header("Authorization");
-
     if (!token) {
         return res.status(401).json({ error: "Acceso denegado" });
     }
