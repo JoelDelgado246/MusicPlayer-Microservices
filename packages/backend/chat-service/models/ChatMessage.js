@@ -17,7 +17,7 @@ const ChatMessage = sequelize.define("ChatMessage", {
     },
     timestamp: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        allowNull: true
     }
 }, {
     tableName: "ChatMensajes",

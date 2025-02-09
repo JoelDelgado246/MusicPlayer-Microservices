@@ -1,9 +1,21 @@
 import ChatMessage from "../models/ChatMessage.js";
 
-// Guardar un mensaje en la base de datos
 export const saveMessage = async (usuario, mensaje) => {
-    return await ChatMessage.create({ usuario, mensaje });
+    try {
+        const newMessage = await ChatMessage.create({
+            usuario,
+            mensaje
+            // 🔥 No enviamos `timestamp`, SQL Server lo genera automáticamente
+        });
+
+        return newMessage;
+    } catch (error) {
+        console.error("❌ Error en saveMessage:", error);
+        throw error;
+    }
 };
+
+
 
 // Obtener los últimos mensajes del chat
 export const getRecentMessages = async (limit = 20) => {
