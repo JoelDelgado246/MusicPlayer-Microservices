@@ -1,0 +1,58 @@
+http:
+  port: 4000
+admin:
+  port: 9876
+  host: localhost
+apiEndpoints:
+  api:
+    host: localhost
+    paths: '/ip'
+  users:
+    host: localhost
+    paths:
+      - "/api/auth/*"
+  chat:
+    host: localhost
+    paths:
+      - "/api/chat/*"
+serviceEndpoints:
+  httpbin:
+    url: 'https://httpbin.org'
+  userService:
+    url: "http://localhost:5001"
+  chatService:
+    url: "http://localhost:5002"
+policies:
+  - jwt
+  - proxy
+pipelines:
+  default:
+    apiEndpoints:
+      - api
+    policies:
+    # Uncomment `key-auth:` when instructed to in the Getting Started guide.
+    # - key-auth:
+      - proxy:
+          - action:
+              serviceEndpoint: httpbin 
+              changeOrigin: true
+  api-auth:
+    apiEndpoints:
+      - users
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: userService
+              changeOrigin: true
+  api-chat:
+    apiEndpoints:
+      - chat
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: "tu_secreto_super_seguro" 
+              checkAuthorization: true
+      - proxy:
+          - action:
+              serviceEndpoint: chatService
+              changeOrigin: true
