@@ -3,6 +3,7 @@ http:
 admin:
   port: 9876
   host: localhost
+
 apiEndpoints:
   api:
     host: localhost
@@ -15,6 +16,11 @@ apiEndpoints:
     host: localhost
     paths:
       - "/api/chat/*"
+  favorites:
+    host: localhost
+    paths:
+      - "/api/favorites/*"
+
 serviceEndpoints:
   httpbin:
     url: 'https://httpbin.org'
@@ -22,20 +28,23 @@ serviceEndpoints:
     url: "http://localhost:5001"
   chatService:
     url: "http://localhost:5002"
+  favoritesService:
+    url: "http://localhost:5003"
+
 policies:
   - jwt
   - proxy
+
 pipelines:
   default:
     apiEndpoints:
       - api
     policies:
-    # Uncomment `key-auth:` when instructed to in the Getting Started guide.
-    # - key-auth:
       - proxy:
           - action:
               serviceEndpoint: httpbin 
               changeOrigin: true
+
   api-auth:
     apiEndpoints:
       - users
@@ -44,15 +53,33 @@ pipelines:
           - action:
               serviceEndpoint: userService
               changeOrigin: true
+
   api-chat:
     apiEndpoints:
       - chat
     policies:
       - jwt:
           - action:
-              secretOrPublicKey: "tu_secreto_super_seguro" 
+              secretOrPublicKey: "tu_secreto_super_seguro"  # ✅ Usa la variable de entorno
               checkAuthorization: true
       - proxy:
           - action:
               serviceEndpoint: chatService
               changeOrigin: true
+              headers:  # ✅ Asegura que pase el token de autorización al servicio de chat
+                Authorization: "[[req.headers.authorization]]"
+
+  api-favorites:
+    apiEndpoints:
+      - favorites
+    policies:
+      - jwt:
+          - action:
+              secretOrPublicKey: "tu_secreto_super_seguro"  # ✅ Usa la variable de entorno
+              checkAuthorization: true
+      - proxy:
+          - action:
+              serviceEndpoint: favoritesService
+              changeOrigin: true
+              headers:  # ✅ Asegura que pase el token de autorización al servicio de favoritos
+                Authorization: "[[req.headers.authorization]]"
