@@ -27,13 +27,13 @@ export const PlaylistsProvider = ({ children }) => {
 // En PlaylistsContext.jsx o el archivo donde esté definida la función
 const loadSongsForPlaylist = async (playlistId) => {
   try {
-    const response = await axios.get("http://localhost:3000/api/trending");
+    const response = await axios.get("http://localhost:4000/api/music/trending");
     const songs = response.data.map((track) => ({
       id: track.id,
       title: track.title,
       artist: track.user.name,
       artwork: track.artwork["150x150"], 
-      streamUrl: `http://localhost:3000/api/tracks/${track.id}/stream`, 
+      streamUrl: `http://localhost:4000/api/music/tracks/${track.id}/stream`, 
     }));
     return songs;
   } catch (error) {
@@ -41,9 +41,6 @@ const loadSongsForPlaylist = async (playlistId) => {
     return [];
   }
 };
-
-    
-  
 
   return (
     <PlaylistsContext.Provider

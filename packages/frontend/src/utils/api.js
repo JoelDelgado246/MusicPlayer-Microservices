@@ -1,29 +1,33 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const API_URL = `${BASE_URL}/auth`;
 
-export const loginUser = async (username, password) => {
+export const loginUser = async (email, contraseña) => {
+  console.log("🟡 Enviando datos a login:", { email, contraseña });
+
   const response = await fetch(`${API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, contraseña }),  // 🔥 Asegurar que los nombres de los campos son correctos
   });
 
   if (!response.ok) {
-    throw new Error("Credenciales incorrectas");
+      const errorData = await response.json();
+      console.error("❌ Error en loginUser:", errorData);
+      throw new Error(errorData.error || "Credenciales incorrectas");
   }
 
-  //return await response.json(); // Devuelve tokens y datos de usuario
-  const data = await response.json(); // Procesa el JSON
-  console.log("Respuesta del backend en loginUser:", data); // Verifica la respuesta
-  return data; // Devuelve los datos para el contexto
+  const data = await response.json();
+  console.log("✅ Respuesta del backend en loginUser:", data);
+  return data;
 };
 
 
-export const registerUser = async (username, password) => {
+
+export const registerUser = async (email, contraseña) => {
   const response = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email, contraseña }),
   });
 
   if (!response.ok) {

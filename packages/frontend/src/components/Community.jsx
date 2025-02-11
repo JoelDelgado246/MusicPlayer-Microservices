@@ -4,7 +4,7 @@ import DOMPurify from "dompurify"; // Importar DOMPurify
 import { useChat } from "../context/ChatContext";
 import { useAuth } from "../context/AuthContext";
 
-const socket = io("http://localhost:3000");
+const socket = io("http://localhost:4000/api");
 
 const Community = () => {
   const [message, setMessage] = useState("");

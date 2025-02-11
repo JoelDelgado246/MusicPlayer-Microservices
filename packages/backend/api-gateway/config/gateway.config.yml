@@ -62,6 +62,7 @@ pipelines:
           - action:
               serviceEndpoint: favoritesService
               changeOrigin: true
+              websocket: true
 
   api-music:  # 🔥 Nuevo pipeline para el microservicio de música
     apiEndpoints:
