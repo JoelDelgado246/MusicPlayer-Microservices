@@ -5,9 +5,6 @@ admin:
   host: localhost
 
 apiEndpoints:
-  api:
-    host: localhost
-    paths: '/ip'
   users:
     host: localhost
     paths:
@@ -20,31 +17,25 @@ apiEndpoints:
     host: localhost
     paths:
       - "/api/favorites/*"
+  music:  # 🔥 Nuevo microservicio de música
+    host: localhost
+    paths:
+      - "/api/music/*"
 
 serviceEndpoints:
-  httpbin:
-    url: 'https://httpbin.org'
   userService:
     url: "http://localhost:5001"
   chatService:
     url: "http://localhost:5002"
   favoritesService:
     url: "http://localhost:5003"
+  musicService:  # 🔥 Nuevo microservicio de música
+    url: "http://localhost:5004"
 
 policies:
-  - jwt
   - proxy
 
 pipelines:
-  default:
-    apiEndpoints:
-      - api
-    policies:
-      - proxy:
-          - action:
-              serviceEndpoint: httpbin 
-              changeOrigin: true
-
   api-auth:
     apiEndpoints:
       - users
@@ -58,28 +49,25 @@ pipelines:
     apiEndpoints:
       - chat
     policies:
-      - jwt:
-          - action:
-              secretOrPublicKey: "tu_secreto_super_seguro"  # ✅ Usa la variable de entorno
-              checkAuthorization: true
       - proxy:
           - action:
               serviceEndpoint: chatService
               changeOrigin: true
-              headers:  # ✅ Asegura que pase el token de autorización al servicio de chat
-                Authorization: "[[req.headers.authorization]]"
 
   api-favorites:
     apiEndpoints:
       - favorites
     policies:
-      - jwt:
-          - action:
-              secretOrPublicKey: "tu_secreto_super_seguro"  # ✅ Usa la variable de entorno
-              checkAuthorization: true
       - proxy:
           - action:
               serviceEndpoint: favoritesService
               changeOrigin: true
-              headers:  # ✅ Asegura que pase el token de autorización al servicio de favoritos
-                Authorization: "[[req.headers.authorization]]"
+
+  api-music:  # 🔥 Nuevo pipeline para el microservicio de música
+    apiEndpoints:
+      - music
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: musicService
+              changeOrigin: true
